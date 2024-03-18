@@ -169,39 +169,39 @@ def compute_mis2(g, td):
             if j < i:
                 continue
             
-            powerset_of_bag_edge = list(powerset(number_to_bag[i] & number_to_bag[j]))
-            for l in powerset_of_bag_edge:
+            #powerset_of_bag_edge = list(powerset(number_to_bag[i] & number_to_bag[j]))
+            for l in list(powerset(number_to_bag[j])):
                 if len(l) == 0:
-                    s = None
+                    s_prime = None
                 elif len(l) == 1:
-                    s = l[0]
+                    s_prime = l[0]
                 else:
-                    s = tuple(l)
-                max_val = 0
-                max_set = {}
-                for k in list(powerset(number_to_bag[j])):
-                    if len(k) == 0:
-                        s_prime = None
-                    elif len(k) == 1:
-                        s_prime = k[0]
-                    else:
-                        s_prime = tuple(k)
-                    if (s_prime not in A) or (j not in A[s_prime]):
-                        continue
-                    ms = A[s_prime][j]
-                    if len(ms) > max_val:
-                        max_set = ms
-                        max_val = len(ms)
+                    s_prime = tuple(l)
+                k = set(l) & set(number_to_bag[i])
+                if len(k) == 0:
+                    s = None
+                elif len(k) == 1:
+                    s = list(k)[0]
+                else:
+                    s = tuple(list(k))
+                if (s_prime not in A) or (j not in A[s_prime]):
+                    continue
+                    
                 if s not in B:
                     B[s] = {}
-                B[s][(j, i)] = max_set
-                if len(max_set) == 1:
-                    new = list(max_set)[0]
-                elif len(max_set) > 1:
-                    new = tuple(list(max_set))
-                if new not in B:
-                    B[new] = {}
-                    B[new][(j, i)] = tuple(list(max_set))
+                if (j, i) not in B[s]:
+                    B[s] = A[s_prime][j]
+                else:
+                    if len(B[s][(j, i)]) <= len(A[s_prime][j]):
+                        B[s][(j, i)] = A[s_prime][j]
+                
+                #if len(max_set) == 1:
+                #    new = list(max_set)[0]
+                #elif len(max_set) > 1:
+                #    new = tuple(list(max_set))
+                #if new not in B:
+                #    B[new] = {}
+                #    B[new][(j, i)] = tuple(list(max_set))
         print('----------------COMPUTE B---------BAG NUMBER:',i,'-------------------')
         for k, v in B.items():
             print(k, ':', v)
