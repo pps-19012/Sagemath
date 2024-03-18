@@ -190,7 +190,7 @@ def compute_mis2(g, td):
                 if s not in B:
                     B[s] = {}
                 if (i, j) not in B[s]:
-                    B[s] = A[s_prime][i]
+                    B[s][(i, j)] = A[s_prime][i]
                 else:
                     if len(B[s][(i, j)]) <= len(A[s_prime][i]):
                         B[s][(i, j)] = A[s_prime][i]
