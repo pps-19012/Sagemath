@@ -1,2 +1,15 @@
 # Sagemath
 To keep track of my contributions to the open source Sagemath repo
+
+## MIS
+
+| Vertices | Time taken to compute MIS (not including tree decomposition time)| Time taken to compute MIS (including tree decomposition time)|
+| :---:   | :---: | :---: |
+| 5 | 0.0009064674377441406   | 0.007882833480834961 |
+| 10 | 0.0015799999237060547   | 0.0047070980072021484 |
+| 50 | 0.012010335922241211   | 0.03236126899719238 |
+| 100 | 0.020690202713012695   | 0.0511167049407959 |
+| 500 | 0.13844919204711914   | 0.6075067520141602 |
+| 1000 | 0.3102266788482666   | 1.1300442218780518 |
+| 5000 | 3.538768768310547   | 26.104130506515503 |
+| 10000 | 12.977931261062622  | 113.93210005760193 |
