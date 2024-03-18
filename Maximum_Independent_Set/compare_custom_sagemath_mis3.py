@@ -207,24 +207,30 @@ def compute_mis2(g, td):
             print(k, ':', v)
 
         bags_processed_A[i] = True
-
-    return None, 0
+        
+    mis_set = {}
+    for v in A.keys():
+        if 0 in A[v]:
+            if len(A[v][0]) > len(mis_set):
+                mis_set = A[v][0]
+                
+    return (mis_set, len(mis_set))
 
 
 def main():
-    g = generate_graph_pathwidth_two(10)
+    g = generate_graph_pathwidth_two(8)
     #start = time.time()
-    Im = IndependentSets(g, maximal=True)
+    #Im = IndependentSets(g, maximal=True)
     #end = time.time()
     #print("TIME ELAPSED IN SAGEMATH FUNCTION:", end-start)
-    maxLen = 0
-    maxSet = set()
-    for s in list(Im):
-        if len(s) > maxLen:
-            maxSet = s
-            maxLen = len(s)
+    #maxLen = 0
+    #maxSet = set()
+    #for s in list(Im):
+    #    if len(s) > maxLen:
+    #        maxSet = s
+    #        maxLen = len(s)
     misSet = custom_mis(g)
-    print("MIS SET FROM SAGEMATH FUNCTION:", maxSet)
+    #print("MIS SET FROM SAGEMATH FUNCTION:", maxSet)
     print("MIS SET FROM CUSTOM IMPLEMENTATION:", misSet)
 
 main()
