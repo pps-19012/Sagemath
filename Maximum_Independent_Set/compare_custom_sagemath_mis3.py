@@ -36,8 +36,8 @@ def compute_mis2(g, td):
         if len(td.neighbors(v)) > max_nei:
             max_nei = len(td.neighbors(v))
             root_node = v
-    print("Root Node:", root_node)
-    print("Neighbours of Root Node:", td.neighbors(root_node))
+    #print("Root Node:", root_node)
+    #print("Neighbours of Root Node:", td.neighbors(root_node))
 
     bags = {}
     q = [(root_node, 0)]
@@ -57,7 +57,7 @@ def compute_mis2(g, td):
         if childPresent == False:
             leaf_nodes.append(node)
 
-    print("Leaf Nodes:", leaf_nodes)
+    #print("Leaf Nodes:", leaf_nodes)
     
     bag_number = {}
     bn = 0
@@ -82,9 +82,9 @@ def compute_mis2(g, td):
             A[v][bag_number[b]] = {v}
         bags_processed_A[bag_number[b]] = True
         
-    print('--------------------------------INITIALIZE A-----------------------')
-    for k, v in A.items():
-        print(k, ':', v)
+    #print('--------------------------------INITIALIZE A-----------------------')
+    #for k, v in A.items():
+    #    print(k, ':', v)
         
     leaf_pairs = []
     q = [root_node]
@@ -110,9 +110,9 @@ def compute_mis2(g, td):
             if v not in B:
                 B[v] = {}
             B[v][(i,j)] = {v} & set(number_to_bag[i]) & set(number_to_bag[j])
-    print('--------------------------------INITIALIZE B-----------------------')
-    for k, v in B.items():
-        print(k, ':', v)
+    #print('--------------------------------INITIALIZE B-----------------------')
+    #for k, v in B.items():
+    #    print(k, ':', v)
         
     for i in range(len(bags_processed_A)-1, -1, -1):
         if bags_processed_A[i]:
@@ -159,10 +159,10 @@ def compute_mis2(g, td):
                 A[temp] = {}
                 A[temp][i] = tmp
                
-        print('----------------COMPUTE A---------BAG NUMBER:',i,'-------------------')
-        print(bags_processed_A)
-        for k, v in A.items():
-            print(k, ':', v)
+        #print('----------------COMPUTE A---------BAG NUMBER:',i,'-------------------')
+        #print(bags_processed_A)
+        #for k, v in A.items():
+        #    print(k, ':', v)
             
         for nei in td.neighbors(number_to_bag[i]):
             j = bag_number[nei]
@@ -202,9 +202,9 @@ def compute_mis2(g, td):
                 #if new not in B:
                 #    B[new] = {}
                 #    B[new][(j, i)] = tuple(list(max_set))
-        print('----------------COMPUTE B---------BAG NUMBER:',i,'-------------------')
-        for k, v in B.items():
-            print(k, ':', v)
+        #print('----------------COMPUTE B---------BAG NUMBER:',i,'-------------------')
+        #for k, v in B.items():
+        #    print(k, ':', v)
 
         bags_processed_A[i] = True
         
@@ -218,7 +218,7 @@ def compute_mis2(g, td):
 
 
 def main():
-    g = generate_graph_pathwidth_two(8)
+    g = generate_graph_pathwidth_two(10000)
     #start = time.time()
     #Im = IndependentSets(g, maximal=True)
     #end = time.time()
