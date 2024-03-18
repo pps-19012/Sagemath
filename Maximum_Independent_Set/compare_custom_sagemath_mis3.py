@@ -166,34 +166,34 @@ def compute_mis2(g, td):
             
         for nei in td.neighbors(number_to_bag[i]):
             j = bag_number[nei]
-            if j < i:
+            if j > i:
                 continue
             
             #powerset_of_bag_edge = list(powerset(number_to_bag[i] & number_to_bag[j]))
-            for l in list(powerset(number_to_bag[j])):
+            for l in list(powerset(number_to_bag[i])):
                 if len(l) == 0:
                     s_prime = None
                 elif len(l) == 1:
                     s_prime = l[0]
                 else:
                     s_prime = tuple(l)
-                k = set(l) & set(number_to_bag[i])
+                k = set(l) & set(number_to_bag[j])
                 if len(k) == 0:
                     s = None
                 elif len(k) == 1:
                     s = list(k)[0]
                 else:
                     s = tuple(list(k))
-                if (s_prime not in A) or (j not in A[s_prime]):
+                if (s_prime not in A) or (i not in A[s_prime]):
                     continue
                     
                 if s not in B:
                     B[s] = {}
-                if (j, i) not in B[s]:
-                    B[s] = A[s_prime][j]
+                if (i, j) not in B[s]:
+                    B[s] = A[s_prime][i]
                 else:
-                    if len(B[s][(j, i)]) <= len(A[s_prime][j]):
-                        B[s][(j, i)] = A[s_prime][j]
+                    if len(B[s][(i, j)]) <= len(A[s_prime][i]):
+                        B[s][(i, j)] = A[s_prime][i]
                 
                 #if len(max_set) == 1:
                 #    new = list(max_set)[0]
