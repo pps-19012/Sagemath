@@ -121,14 +121,14 @@ def compute_mis2(g, td):
         powerset_of_bag_node = list(powerset(number_to_bag[i]))
         # Compute A(S, i)
         for k in powerset_of_bag_node:
-            print("K:", k)
+            #print("K:", k)
             tmp = set(k)
             for nei in td.neighbors(number_to_bag[i]):
                 j = bag_number[nei]
                 if j < i:
                     continue
                 common = list(set(k) & set(nei))
-                print("Common:", common)
+                #print("Common:", common)
                 if len(common) == 0:
                     if (j, i) in B[None]:
                         tmp = tmp | set(B[None][(j, i)])
@@ -147,8 +147,8 @@ def compute_mis2(g, td):
                 s = k[0]
             else:
                 s = tuple(k)    
-            if s not in B:
-                continue
+                if s not in B:
+                    continue
             if s not in A:
                 A[s] = {}
             A[s][i] = tmp
