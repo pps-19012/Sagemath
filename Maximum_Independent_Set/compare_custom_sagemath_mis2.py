@@ -153,11 +153,42 @@ def compute_mis2(g, td):
                 A[s] = {}
             A[s][i] = tmp
                
-        print('------------------------------------------------------------')
+        print('----------------COMPUTE A---------BAG NUMBER:',i,'-------------------')
         print(bags_processed_A)
         for k, v in A.items():
             print(k, ':', v)
-        break
+            
+        for nei in td.neighbors(number_to_bag[i]):
+            j = bag_number[nei]
+            if j > i:
+                continue
+            
+            powerset_of_bag_edge = list(powerset(number_to_bag[i] & number_to_bag[j]))
+            for k in powerset_of_bag_edge:
+                if len(k) == 0:
+                    s = None
+                elif len(k) == 1:
+                    s = k[0]
+                else:
+                    s = tuple(k)
+                max_val = 0
+                max_set = {}
+                if s not in A:
+                    continue
+                ms = A[s][i]
+                if len(ms) > max_val:
+                    max_set = ms
+                    max_val = len(ms)
+                if s not in B:
+                    B[s] = {}
+                B[s][(i, j)] = max_set
+            B[None][(i, j)] = A[None][i]
+            
+        bags_processed_A[i] = True
+        
+        print('----------------COMPUTE B---------BAG NUMBER:',i,'-------------------')
+        for k, v in B.items():
+            print(k, ':', v)
 
     return None, 0
 
