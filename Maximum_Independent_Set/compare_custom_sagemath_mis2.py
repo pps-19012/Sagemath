@@ -152,6 +152,13 @@ def compute_mis2(g, td):
             if s not in A:
                 A[s] = {}
             A[s][i] = tmp
+            if len(tmp) == 1:
+                temp = list(tmp)[0]
+            else:
+                temp = tuple(list(tmp))
+            if  temp not in A:
+                A[temp] = {}
+                A[temp][i] = tmp
                
         print('----------------COMPUTE A---------BAG NUMBER:',i,'-------------------')
         print(bags_processed_A)
@@ -182,13 +189,15 @@ def compute_mis2(g, td):
                 if s not in B:
                     B[s] = {}
                 B[s][(i, j)] = max_set
+                if tuple(list(max_set)) not in B:
+                    B[tuple(list(max_set))] = {}
+                    B[tuple(list(max_set))][(i, j)] = max_set
             B[None][(i, j)] = A[None][i]
-            
-        bags_processed_A[i] = True
-        
         print('----------------COMPUTE B---------BAG NUMBER:',i,'-------------------')
         for k, v in B.items():
             print(k, ':', v)
+
+        bags_processed_A[i] = True
 
     return None, 0
 
