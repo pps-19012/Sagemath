@@ -167,7 +167,7 @@ def compute_mis2(g, td):
             
         for nei in td.neighbors(number_to_bag[i]):
             j = bag_number[nei]
-            if j > i:
+            if j < i:
                 continue
             
             powerset_of_bag_edge = list(powerset(number_to_bag[i] & number_to_bag[j]))
@@ -195,9 +195,8 @@ def compute_mis2(g, td):
                         max_val = len(ms)
                 if s not in B:
                     B[s] = {}
-                print("MS:", ms, "S:", s, "(i, j):", i, j)
-                B[s][(i, j)] = max_set
-            B[None][(i, j)] = A[None][i]
+                B[s][(j, i)] = max_set
+            B[None][(j, i)] = A[None][i]
         print('----------------COMPUTE B---------BAG NUMBER:',i,'-------------------')
         for k, v in B.items():
             print(k, ':', v)
