@@ -141,8 +141,7 @@ def compute_mis2(g, td):
                     if v in B and (j, i) in B[v]:
                         tmp = tmp | (set(B[v][(j, i)]) - (set(common) & set(number_to_bag[j])))
             if len(k) == 0:
-                A[None][i] = tmp
-                continue
+                s = None
             elif len(k) == 1:
                 s = k[0]
             else:
@@ -154,9 +153,9 @@ def compute_mis2(g, td):
             A[s][i] = tmp
             if len(tmp) == 1:
                 temp = list(tmp)[0]
-            else:
+            elif len(tmp) > 1:
                 temp = tuple(list(tmp))
-            if  temp not in A:
+            if temp not in A:
                 A[temp] = {}
                 A[temp][i] = tmp
                
@@ -171,32 +170,38 @@ def compute_mis2(g, td):
                 continue
             
             powerset_of_bag_edge = list(powerset(number_to_bag[i] & number_to_bag[j]))
-            for k in list(powerset(number_to_bag[j])):
-                if len(k) == 0:
+            for l in powerset_of_bag_edge:
+                if len(l) == 0:
                     s = None
-                elif len(k) == 1:
-                    s = k[0]
+                elif len(l) == 1:
+                    s = l[0]
                 else:
-                    s = tuple(k)
+                    s = tuple(l)
                 max_val = 0
                 max_set = {}
-                for k in powerset_of_bag_node:
+                for k in list(powerset(number_to_bag[j])):
                     if len(k) == 0:
                         s_prime = None
                     elif len(k) == 1:
                         s_prime = k[0]
                     else:
                         s_prime = tuple(k)
-                    if s_prime not in A:
+                    if (s_prime not in A) or (j not in A[s_prime]):
                         continue
-                    ms = A[s_prime][i]
+                    ms = A[s_prime][j]
                     if len(ms) > max_val:
                         max_set = ms
                         max_val = len(ms)
                 if s not in B:
                     B[s] = {}
                 B[s][(j, i)] = max_set
-            B[None][(j, i)] = A[None][i]
+                if len(max_set) == 1:
+                    new = list(max_set)[0]
+                elif len(max_set) > 1:
+                    new = tuple(list(max_set))
+                if new not in B:
+                    B[new] = {}
+                    B[new][(j, i)] = tuple(list(max_set))
         print('----------------COMPUTE B---------BAG NUMBER:',i,'-------------------')
         for k, v in B.items():
             print(k, ':', v)
