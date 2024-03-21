@@ -1,6 +1,5 @@
 from sage.graphs.graph_decompositions.tree_decomposition import *
 from sage.graphs.generators.basic import CompleteGraph
-from sage.graphs.independent_sets import IndependentSets
 import time
 import itertools
 
