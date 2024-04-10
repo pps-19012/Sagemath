@@ -107,7 +107,8 @@ def compute_mis(g, td):
         for v in inter:
             if v not in B:
                 B[v] = {}
-            B[v][(i,j)] = {v} & set(number_to_bag[i]) & set(number_to_bag[j])
+            if v in (number_to_bag[i] & number_to_bag[j]):
+                B[v][(i,j)] = {v}
     #print('--------------------------------INITIALIZE B-----------------------')
     #for k, v in B.items():
     #    print(k, ':', v)
@@ -115,7 +116,6 @@ def compute_mis(g, td):
     for i in range(len(bags_processed_A)-1, -1, -1):
         if bags_processed_A[i]:
             continue
-            
         # Compute A(S, i)
         powerset_of_bag_node = list(powerset(number_to_bag[i]))
         for k in powerset_of_bag_node:
@@ -207,7 +207,7 @@ def compute_mis(g, td):
 
 
 def main():
-    g = generate_graph_pathwidth_two(10000)
+    g = generate_graph_pathwidth_two(1000)
     misSet = mis(g)
     print("MIS SET FROM CUSTOM IMPLEMENTATION:", misSet)
 
