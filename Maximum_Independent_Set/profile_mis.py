@@ -1,35 +1,14 @@
 from sage.graphs.graph_decompositions.tree_decomposition import *
 from sage.graphs.generators.basic import CompleteGraph
 import time
-import itertools
 import cProfile
 
-def profile_main():
+def profile_main(g, td):
     def powerset(s):
         x = len(s)
         masks = [1 << i for i in range(x)]
         for i in range(1 << x):
             yield [ss for mask, ss in zip(masks, s) if i & mask]
-
-    def generate_graph_pathwidth_two(vertices):
-        k = 3
-        g = CompleteGraph(k)
-        while k <= vertices-1:
-            g.add_vertex(k)
-            g.add_edge(k, k-1)
-            g.add_edge(k, k-2)
-            k += 1
-        #show(g)
-        return g
-
-    def mis(g):
-        start = time.time()
-        td = g.treewidth(certificate=True)
-        #show(td)
-        mis_set, mis_val = compute_mis(g, td)
-        end = time.time()
-        print("TIME ELAPSDED IN MIS NOT GIVEN TREE DECOMPOSITION:", end-start)
-        return (mis_set, mis_val)
 
     def compute_mis(g, td):
         start = time.time()
@@ -57,8 +36,6 @@ def profile_main():
             if childPresent == False:
                 leaf_nodes.append(node)
 
-        #print("Leaf Nodes:", leaf_nodes)
-
         bag_number = {}
         bn = 0
         for k, ver in bags.items():
@@ -81,10 +58,6 @@ def profile_main():
                     A[v] = {}
                 A[v][bag_number[b]] = {v}
             bags_processed_A[bag_number[b]] = True
-
-        #print('--------------------------------INITIALIZE A-----------------------')
-        #for k, v in A.items():
-        #    print(k, ':', v)
 
         leaf_pairs = []
         q = [root_node]
@@ -109,35 +82,33 @@ def profile_main():
             for v in inter:
                 if v not in B:
                     B[v] = {}
-                B[v][(i,j)] = {v} & set(number_to_bag[i]) & set(number_to_bag[j])
-        #print('--------------------------------INITIALIZE B-----------------------')
-        #for k, v in B.items():
-        #    print(k, ':', v)
+                if v in (number_to_bag[i] & number_to_bag[j]):
+                    B[v][(i,j)] = {v}
 
         for i in range(len(bags_processed_A)-1, -1, -1):
             if bags_processed_A[i]:
                 continue
 
             # Compute A(S, i)
-            powerset_of_bag_node = list(powerset(number_to_bag[i]))
+            powerset_of_bag_node = powerset(number_to_bag[i])
             for k in powerset_of_bag_node:
                 tmp = set(k)
                 for nei in td.neighbors(number_to_bag[i]):
                     j = bag_number[nei]
                     if j < i:
                         continue
-                    common = list(set(k) & set(nei))
+                    common = set(k) & set(nei)
                     if len(common) == 0:
                         if (j, i) in B[None]:
                             tmp = tmp | set(B[None][(j, i)])
                     elif len(common) == 1:
-                        v = common[0]
+                        v = common.pop()
                         if v in B and (j, i) in B[v]:
-                            tmp = tmp | (set(B[v][(j, i)]) - (set(common) & set(number_to_bag[j])))
+                            tmp = tmp | (B[v][(j, i)] - (common & set(number_to_bag[j])))
                     else:
                         v = tuple(common)
                         if v in B and (j, i) in B[v]:
-                            tmp = tmp | (set(B[v][(j, i)]) - (set(common) & set(number_to_bag[j])))
+                            tmp = tmp | (B[v][(j, i)] - (common & set(number_to_bag[j])))
                 if len(k) == 0:
                     s = None
                 elif len(k) == 1:
@@ -150,16 +121,12 @@ def profile_main():
                     A[s] = {}
                 A[s][i] = tmp
                 if len(tmp) == 1:
-                    temp = list(tmp)[0]
+                    temp = tmp.pop()
                 elif len(tmp) > 1:
-                    temp = tuple(list(tmp))
+                    temp = tuple(tmp)
                 if temp not in A:
                     A[temp] = {}
                     A[temp][i] = tmp
-
-            #print('----------------COMPUTE A---------BAG NUMBER:',i,'-------------------')
-            #for k, v in A.items():
-            #    print(k, ':', v)
 
             # Compute B(S, i, j)
             for nei in td.neighbors(number_to_bag[i]):
@@ -167,7 +134,7 @@ def profile_main():
                 if j > i:
                     continue
 
-                for l in list(powerset(number_to_bag[i])):
+                for l in powerset(number_to_bag[i]):
                     if len(l) == 0:
                         s_prime = None
                     elif len(l) == 1:
@@ -178,9 +145,9 @@ def profile_main():
                     if len(k) == 0:
                         s = None
                     elif len(k) == 1:
-                        s = list(k)[0]
+                        s = k.pop()
                     else:
-                        s = tuple(list(k))
+                        s = tuple(k)
                     if (s_prime not in A) or (i not in A[s_prime]):
                         continue
 
@@ -192,27 +159,43 @@ def profile_main():
                         if len(B[s][(i, j)]) <= len(A[s_prime][i]):
                             B[s][(i, j)] = A[s_prime][i]
 
-            #print('----------------COMPUTE B---------BAG NUMBER:',i,'-------------------')
-            #for k, v in B.items():
-            #    print(k, ':', v)
-
             bags_processed_A[i] = True
 
         mis_set = {}
         for v in A.keys():
-            if 0 in A[v]:
-                if len(A[v][0]) > len(mis_set):
-                    mis_set = A[v][0]
+            if 0 in A[v] and len(A[v][0]) > len(mis_set):
+                mis_set = A[v][0]
         end = time.time()
         print("TIME ELAPSDED IN MIS GIVEN TREE DECOMPOSITION:", end-start)
         return (mis_set, len(mis_set))
-
-
-    def main():
-        g = generate_graph_pathwidth_two(100)
-        misSet = mis(g)
-        print("MIS SET FROM CUSTOM IMPLEMENTATION:", misSet)
-
-    main()
     
+    compute_mis(g, td)
+    
+def generate_graph_pathwidth_two(vertices):
+    k = 3
+    g = CompleteGraph(k)
+    while k <= vertices-1:
+        g.add_vertex(k)
+        g.add_edge(k, k-1)
+        g.add_edge(k, k-2)
+        k += 1
+    #show(g)
+    return g
+
+def mis(g):
+    start = time.time()
+    td = g.treewidth(certificate=True)
+    #show(td)
+    mis_set, mis_val = profile_main(g, td)
+    end = time.time()
+    print("TIME ELAPSDED IN MIS NOT GIVEN TREE DECOMPOSITION:", end-start)
+    return (mis_set, mis_val)
+
+def main():
+    g = generate_graph_pathwidth_two(1000)
+    misSet = mis(g)
+    print("MIS SET FROM CUSTOM IMPLEMENTATION:", misSet)
+
+main()
+
 cProfile.run('profile_main()')
