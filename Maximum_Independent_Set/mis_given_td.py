@@ -117,7 +117,7 @@ def compute_mis(g, td):
         if bags_processed_A[i]:
             continue
         # Compute A(S, i)
-        powerset_of_bag_node = list(powerset(number_to_bag[i]))
+        powerset_of_bag_node = powerset(number_to_bag[i])
         for k in powerset_of_bag_node:
             tmp = set(k)
             for nei in td.neighbors(number_to_bag[i]):
@@ -165,7 +165,7 @@ def compute_mis(g, td):
             if j > i:
                 continue
 
-            for l in list(powerset(number_to_bag[i])):
+            for l in powerset(number_to_bag[i]):
                 if len(l) == 0:
                     s_prime = None
                 elif len(l) == 1:
