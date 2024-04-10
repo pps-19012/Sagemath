@@ -3,12 +3,32 @@ from sage.graphs.generators.basic import CompleteGraph
 import time
 import cProfile
 
-def profile_main(g, td):
+def profile_main():
     def powerset(s):
         x = len(s)
         masks = [1 << i for i in range(x)]
         for i in range(1 << x):
             yield [ss for mask, ss in zip(masks, s) if i & mask]
+
+    def generate_graph_pathwidth_two(vertices):
+        k = 3
+        g = CompleteGraph(k)
+        while k <= vertices-1:
+            g.add_vertex(k)
+            g.add_edge(k, k-1)
+            g.add_edge(k, k-2)
+            k += 1
+        #show(g)
+        return g
+
+    def mis(g):
+        start = time.time()
+        td = g.treewidth(certificate=True)
+        #show(td)
+        mis_set, mis_val = compute_mis(g, td)
+        end = time.time()
+        print("TIME ELAPSDED IN MIS NOT GIVEN TREE DECOMPOSITION:", end-start)
+        return (mis_set, mis_val)
 
     def compute_mis(g, td):
         start = time.time()
@@ -168,34 +188,13 @@ def profile_main(g, td):
         end = time.time()
         print("TIME ELAPSDED IN MIS GIVEN TREE DECOMPOSITION:", end-start)
         return (mis_set, len(mis_set))
+
+
+    def main():
+        g = generate_graph_pathwidth_two(1000)
+        misSet = mis(g)
+        print("MIS SET FROM CUSTOM IMPLEMENTATION:", misSet)
+
+    main()
     
-    compute_mis(g, td)
-    
-def generate_graph_pathwidth_two(vertices):
-    k = 3
-    g = CompleteGraph(k)
-    while k <= vertices-1:
-        g.add_vertex(k)
-        g.add_edge(k, k-1)
-        g.add_edge(k, k-2)
-        k += 1
-    #show(g)
-    return g
-
-def mis(g):
-    start = time.time()
-    td = g.treewidth(certificate=True)
-    #show(td)
-    mis_set, mis_val = profile_main(g, td)
-    end = time.time()
-    print("TIME ELAPSDED IN MIS NOT GIVEN TREE DECOMPOSITION:", end-start)
-    return (mis_set, mis_val)
-
-def main():
-    g = generate_graph_pathwidth_two(1000)
-    misSet = mis(g)
-    print("MIS SET FROM CUSTOM IMPLEMENTATION:", misSet)
-
-main()
-
 cProfile.run('profile_main()')
