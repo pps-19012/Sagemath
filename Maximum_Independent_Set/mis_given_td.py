@@ -124,12 +124,12 @@ def compute_mis(g, td):
                 j = bag_number[nei]
                 if j < i:
                     continue
-                common = list(set(k) & set(nei))
+                common = set(k) & set(nei)
                 if len(common) == 0:
                     if (j, i) in B[None]:
                         tmp = tmp | set(B[None][(j, i)])
                 elif len(common) == 1:
-                    v = common[0]
+                    v = common.pop()
                     if v in B and (j, i) in B[v]:
                         tmp = tmp | (set(B[v][(j, i)]) - (set(common) & set(number_to_bag[j])))
                 else:
