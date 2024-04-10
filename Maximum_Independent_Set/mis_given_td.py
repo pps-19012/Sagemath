@@ -148,9 +148,9 @@ def compute_mis(g, td):
                 A[s] = {}
             A[s][i] = tmp
             if len(tmp) == 1:
-                temp = list(tmp)[0]
+                temp = tmp.pop()
             elif len(tmp) > 1:
-                temp = tuple(list(tmp))
+                temp = tuple(tmp)
             if temp not in A:
                 A[temp] = {}
                 A[temp][i] = tmp
