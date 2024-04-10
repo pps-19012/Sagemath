@@ -55,8 +55,6 @@ def compute_mis(g, td):
         if childPresent == False:
             leaf_nodes.append(node)
 
-    #print("Leaf Nodes:", leaf_nodes)
-    
     bag_number = {}
     bn = 0
     for k, ver in bags.items():
@@ -79,11 +77,7 @@ def compute_mis(g, td):
                 A[v] = {}
             A[v][bag_number[b]] = {v}
         bags_processed_A[bag_number[b]] = True
-        
-    #print('--------------------------------INITIALIZE A-----------------------')
-    #for k, v in A.items():
-    #    print(k, ':', v)
-        
+
     leaf_pairs = []
     q = [root_node]
     visit = set()
@@ -109,13 +103,11 @@ def compute_mis(g, td):
                 B[v] = {}
             if v in (number_to_bag[i] & number_to_bag[j]):
                 B[v][(i,j)] = {v}
-    #print('--------------------------------INITIALIZE B-----------------------')
-    #for k, v in B.items():
-    #    print(k, ':', v)
-        
+
     for i in range(len(bags_processed_A)-1, -1, -1):
         if bags_processed_A[i]:
             continue
+            
         # Compute A(S, i)
         powerset_of_bag_node = powerset(number_to_bag[i])
         for k in powerset_of_bag_node:
@@ -154,11 +146,7 @@ def compute_mis(g, td):
             if temp not in A:
                 A[temp] = {}
                 A[temp][i] = tmp
-               
-        #print('----------------COMPUTE A---------BAG NUMBER:',i,'-------------------')
-        #for k, v in A.items():
-        #    print(k, ':', v)
-        
+
         # Compute B(S, i, j)
         for nei in td.neighbors(number_to_bag[i]):
             j = bag_number[nei]
@@ -189,18 +177,13 @@ def compute_mis(g, td):
                 else:
                     if len(B[s][(i, j)]) <= len(A[s_prime][i]):
                         B[s][(i, j)] = A[s_prime][i]
-
-        #print('----------------COMPUTE B---------BAG NUMBER:',i,'-------------------')
-        #for k, v in B.items():
-        #    print(k, ':', v)
-
+                        
         bags_processed_A[i] = True
         
     mis_set = {}
     for v in A.keys():
-        if 0 in A[v]:
-            if len(A[v][0]) > len(mis_set):
-                mis_set = A[v][0]
+        if 0 in A[v] and len(A[v][0]) > len(mis_set):
+            mis_set = A[v][0]
     end = time.time()
     print("TIME ELAPSDED IN MIS GIVEN TREE DECOMPOSITION:", end-start)
     return (mis_set, len(mis_set))
