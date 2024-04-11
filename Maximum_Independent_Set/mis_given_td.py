@@ -121,7 +121,7 @@ def compute_mis(g, td):
                     if (j, i) in B[None]:
                         tmp = tmp | set(B[None][(j, i)])
                 elif len(common) == 1:
-                    v = common.pop()
+                    v = list(common)[0]
                     if v in B and (j, i) in B[v]:
                         tmp = tmp | (B[v][(j, i)] - (common & set(number_to_bag[j])))
                 else:
@@ -140,7 +140,7 @@ def compute_mis(g, td):
                 A[s] = {}
             A[s][i] = tmp
             if len(tmp) == 1:
-                temp = tmp.pop()
+                temp = list(tmp)[0]
             elif len(tmp) > 1:
                 temp = tuple(tmp)
             if temp not in A:
@@ -164,7 +164,7 @@ def compute_mis(g, td):
                 if len(k) == 0:
                     s = None
                 elif len(k) == 1:
-                    s = k.pop()
+                    s = list(k)[0]
                 else:
                     s = tuple(k)
                 if (s_prime not in A) or (i not in A[s_prime]):
