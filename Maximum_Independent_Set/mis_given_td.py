@@ -24,12 +24,15 @@ def mis(g):
     start = time.time()
     td = g.treewidth(certificate=True)
     #show(td)
-    mis_set, mis_val = compute_mis(g, td)
+    powersets = {}
+    for v in td.vertices():
+        powersets[v] = list(powerset(v))
+    mis_set, mis_val = compute_mis(g, td, powersets)
     end = time.time()
     print("TIME ELAPSDED IN MIS NOT GIVEN TREE DECOMPOSITION:", end-start)
     return (mis_set, mis_val)
 
-def compute_mis(g, td):
+def compute_mis(g, td, powersets):
     start = time.time()
     max_nei = 0
     for v in td.vertices():
@@ -109,7 +112,7 @@ def compute_mis(g, td):
             continue
             
         # Compute A(S, i)
-        powerset_of_bag_node = powerset(number_to_bag[i])
+        powerset_of_bag_node = powersets[number_to_bag[i]]
         for k in powerset_of_bag_node:
             tmp = set(k)
             for nei in td.neighbors(number_to_bag[i]):
@@ -153,7 +156,7 @@ def compute_mis(g, td):
             if j > i:
                 continue
 
-            for l in powerset(number_to_bag[i]):
+            for l in powersets[number_to_bag[i]]:
                 if len(l) == 0:
                     s_prime = None
                 elif len(l) == 1:
@@ -193,5 +196,10 @@ def main():
     g = generate_graph_pathwidth_two(1000)
     misSet = mis(g)
     print("MIS SET FROM CUSTOM IMPLEMENTATION:", misSet)
+    start1 = time.time()
+    misSet1 = g.independent_set()
+    end1 = time.time()
+    print("MIS SET FROM SAGE IMPLEMENTATION:", misSet1)
+    print("TIME ELAPSED IN SAGE IMPLEMENTATION:", end1-start1)
 
 main()
