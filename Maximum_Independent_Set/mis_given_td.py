@@ -2,6 +2,7 @@ from sage.graphs.graph_decompositions.tree_decomposition import *
 from sage.graphs.generators.basic import CompleteGraph
 import time
 import itertools
+import cProfile
 
 def powerset(s):
     x = len(s)
@@ -17,27 +18,30 @@ def generate_graph_pathwidth_two(vertices):
         g.add_edge(k, k-1)
         g.add_edge(k, k-2)
         k += 1
-    #show(g)
     return g
 
 def mis(g):
     start = time.time()
     td = g.treewidth(certificate=True)
-    #show(td)
     powersets = {}
     for v in td.vertices():
         powersets[v] = list(powerset(v))
-    mis_set, mis_val = compute_mis(g, td, powersets)
+    profiler = cProfile.Profile()
+    profiler.enable()
+    mis_set, mis_val = compute_mis(g, td, powersets, td_neighbors={v: list(td.neighbors(v)) for v in td.vertices()})
+    profiler.disable()
+    profiler.print_stats(sort='cumtime')
+    
     end = time.time()
-    print("TIME ELAPSDED IN MIS NOT GIVEN TREE DECOMPOSITION:", end-start)
+    print("TIME ELAPSED IN MIS NOT GIVEN TREE DECOMPOSITION:", end-start)
     return (mis_set, mis_val)
 
-def compute_mis(g, td, powersets):
+def compute_mis(g, td, powersets, td_neighbors):
     start = time.time()
     max_nei = 0
     for v in td.vertices():
-        if len(td.neighbors(v)) > max_nei:
-            max_nei = len(td.neighbors(v))
+        if len(td_neighbors[v]) > max_nei:
+            max_nei = len(td_neighbors[v])
             root_node = v
             
     bags = {}
@@ -51,11 +55,11 @@ def compute_mis(g, td, powersets):
         if level not in bags:
             bags[level] = []
         bags[level].append(node)
-        for nei in td.neighbors(node):
+        for nei in td_neighbors[node]:
             if nei not in visit:
                 childPresent = True
                 q.append((nei, level+1))
-        if childPresent == False:
+        if not childPresent:
             leaf_nodes.append(node)
 
     bag_number = {}
@@ -87,7 +91,7 @@ def compute_mis(g, td, powersets):
     while q:
         node = q.pop(0)
         visit.add(node)
-        for nei in td.neighbors(node):
+        for nei in td_neighbors[node]:
             if nei not in visit:
                 q.append(nei)
                 if node in leaf_nodes or nei in leaf_nodes:
@@ -115,7 +119,7 @@ def compute_mis(g, td, powersets):
         powerset_of_bag_node = powersets[number_to_bag[i]]
         for k in powerset_of_bag_node:
             tmp = set(k)
-            for nei in td.neighbors(number_to_bag[i]):
+            for nei in td_neighbors[number_to_bag[i]]:
                 j = bag_number[nei]
                 if j < i:
                     continue
@@ -151,7 +155,7 @@ def compute_mis(g, td, powersets):
                 A[temp][i] = tmp
 
         # Compute B(S, i, j)
-        for nei in td.neighbors(number_to_bag[i]):
+        for nei in td_neighbors[number_to_bag[i]]:
             j = bag_number[nei]
             if j > i:
                 continue
@@ -188,7 +192,7 @@ def compute_mis(g, td, powersets):
         if 0 in A[v] and len(A[v][0]) > len(mis_set):
             mis_set = A[v][0]
     end = time.time()
-    print("TIME ELAPSDED IN MIS GIVEN TREE DECOMPOSITION:", end-start)
+    print("TIME ELAPSED IN MIS GIVEN TREE DECOMPOSITION:", end-start)
     return (mis_set, len(mis_set))
 
 
@@ -196,6 +200,7 @@ def main():
     g = generate_graph_pathwidth_two(1000)
     misSet = mis(g)
     print("MIS SET FROM CUSTOM IMPLEMENTATION:", misSet)
+    
     start1 = time.time()
     misSet1 = g.independent_set()
     end1 = time.time()
